@@ -53,7 +53,7 @@ class ProductItem extends StatelessWidget {
               ),
               onPressed: () {
                 cart.addItem(
-                  product.id,
+                  product.id as String,
                   product.price,
                   product.title,
                 );
@@ -65,7 +65,7 @@ class ProductItem extends StatelessWidget {
                     action: SnackBarAction(
                       label: 'UNDO',
                       onPressed: () {
-                        cart.removeSingleItem(product.id);
+                        cart.removeSingleItem(product.id as String);
                       },
                     ),
                   ),
