@@ -98,7 +98,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState?.validate();
     if (isValid != null && !isValid) {
       return;
@@ -111,10 +111,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id as String, _editedProduct);
     } else {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog<Null>(
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog<Null>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('An Error occured!'),
@@ -129,15 +130,56 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      }).then((_) {
+      } finally {
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
+      // Navigator.of(context).pop();
     }
-    // Navigator.of(context).pop();
   }
+
+  // void _saveForm() {
+  //   final isValid = _form.currentState?.validate();
+  //   if (isValid != null && !isValid) {
+  //     return;
+  //   }
+  //   _form.currentState?.save();
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   if (_editedProduct.id != null) {
+  //     Provider.of<Products>(context, listen: false)
+  //         .updateProduct(_editedProduct.id as String, _editedProduct);
+  //   } else {
+  //     Provider.of<Products>(context, listen: false)
+  //         .addProduct(_editedProduct)
+  //         .catchError((error) {
+  //       return showDialog<Null>(
+  //         context: context,
+  //         builder: (ctx) => AlertDialog(
+  //           title: const Text('An Error occured!'),
+  //           content: Text('Something went wrong: \n ${error.toString()}'),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: const Text('Okay'),
+  //             )
+  //           ],
+  //         ),
+  //       );
+  //     }).then((_) {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //       Navigator.of(context).pop();
+  //     });
+  //   }
+  //   // Navigator.of(context).pop();
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -64,27 +64,39 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
+  Future<void> fetchAndSetProducts() async {
+    final url = Uri.parse(
+        'https://shopappflutter-e014e-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+
+    try {
+      final response = await http.get(url);
+      print(json.decode(response.body));
+    } catch (error) {
+      throw error;
+    }
+  }
+
   Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     final url = Uri.parse(
         'https://shopappflutter-e014e-default-rtdb.europe-west1.firebasedatabase.app/products.json');
     // 'https://shopappflutter-e014e-default-rtdb.europe-west1.firebasedatabase.app/products');
 
-    return http
-        .post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'price': product.price,
-        'imageUrl': product.imageUrl,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((response) {
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+
       print(json.decode(response.body));
       final newProduct = Product(
         title: product.title,
@@ -96,10 +108,10 @@ class Products with ChangeNotifier {
       // _items.insert (0, newProduct);
       _items.add(newProduct);
       notifyListeners();
-    }).catchError((error) {
+    } catch (error) {
       print(error);
       throw error;
-    });
+    }
   }
 
   void updateProduct(String id, Product newProduct) {
